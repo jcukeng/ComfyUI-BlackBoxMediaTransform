@@ -1,0 +1,29 @@
+# Python / Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# IDEs / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# ComfyUI temp swap directories & cache created by Blackbox Media
+blackbox_stream_*/
+blackbox_swap_*/
+temp/
+*.npy
+
+# Generated output media files (optional, keeping repo clean)
+# Uncomment if you don't want to track local test outputs
+# *.mp4
+# *.webm
+# *.gif
+# *.webp

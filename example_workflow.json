@@ -1,0 +1,98 @@
+{
+  "3": {
+    "inputs": {
+      "flip_method": "y-axis: horizontally",
+      "image": [
+        "10",
+        0
+      ]
+    },
+    "class_type": "ImageFlip",
+    "_meta": {
+      "title": "Flip Image"
+    }
+  },
+  "10": {
+    "inputs": {
+      "media_source": "example.gif",
+      "custom_path": "",
+      "start_frame": 0,
+      "max_frames": 0,
+      "frame_skip": 1,
+      "chunk_size": 50,
+      "if_interrupted": "Restart from 0 (Safe Clean Start)",
+      "sequence_fps": 12,
+      "📁 Select Video / GIF / WebP File...": "upload",
+      "📂 Select Image Sequence Folder...": "browse_seq",
+      "🔄 Reset Chunk Progress (Start from 0)": "reset_chunks"
+    },
+    "class_type": "BlackboxMediaLoader",
+    "_meta": {
+      "title": "Blackbox Media Loader"
+    }
+  },
+  "11": {
+    "inputs": {
+      "stream_meta": [
+        "10",
+        1
+      ]
+    },
+    "class_type": "BlackboxMediaInspector",
+    "_meta": {
+      "title": "Blackbox Media Inspector"
+    }
+  },
+  "12": {
+    "inputs": {
+      "raft_model": "raft_large (High Precision)",
+      "temporal_blend": 0.65,
+      "window_radius": 1,
+      "color_stabilization": 0.5,
+      "occlusion_sensitivity": 1.5,
+      "seamless_loop": true,
+      "images": [
+        "3",
+        0
+      ]
+    },
+    "class_type": "BlackboxOpticalFlowDeflicker",
+    "_meta": {
+      "title": "Blackbox Optical Flow Deflicker"
+    }
+  },
+  "13": {
+    "inputs": {
+      "output_format": "Auto (Match Source Format)",
+      "include_audio": true,
+      "speed_multiplier": 1,
+      "override_fps": 0,
+      "first_frame_hold_ms": 0,
+      "last_frame_hold_ms": 0,
+      "playback_mode": "Normal (Forward)",
+      "loop_count": 0,
+      "video_crf": 18,
+      "max_colors": 256,
+      "dither_mode": "None (Clean Solid Colors)",
+      "webp_quality": 90,
+      "webp_lossless": false,
+      "output_scale": 1,
+      "output_directory": "",
+      "filename_prefix": "Blackbox_Media",
+      "overwrite_existing": false,
+      "📂 Select Output Folder...": "browse_folder",
+      "images": [
+        "12",
+        0
+      ],
+      "stream_meta": [
+        "10",
+        1
+      ]
+    },
+    "class_type": "BlackboxMediaSaver",
+    "_meta": {
+      "title": "Blackbox Media Saver & Muxer"
+    }
+  }
+}
