@@ -14,6 +14,7 @@ app.registerExtension({
                 const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
                 const node = this;
                 node._isConfiguringGraph = false;
+                node._createdTimestamp = Date.now();
 
                 const fileInput = document.createElement("input");
                 fileInput.type = "file";
@@ -58,21 +59,23 @@ app.registerExtension({
                     }
                 });
 
-                // Helper: only execute button callback on genuine user mouse click (ignores JSON/API graph loading)
-                function isGenuineUserClick(event) {
+                // Blocks automatic callback execution during JSON/API workflow loading
+                // while allowing all genuine user clicks on the canvas.
+                function canExecuteButtonAction() {
                     if (node._isConfiguringGraph || app.configuringGraph) return false;
-                    if (!event) return false;
-                    return (event.type === "pointerdown" || event.type === "mousedown" || event.type === "click");
+                    if (Date.now() - (node._createdTimestamp || 0) < 400) return false;
+                    return true;
                 }
 
-                const uploadWidget = node.addWidget("button", "📁 Select Video / GIF / WebP File...", null, function (value, canvas, n, pos, event) {
-                    if (!isGenuineUserClick(event)) return;
+                const uploadWidget = node.addWidget("button", "📁 Select Video / GIF / WebP File...", "upload", () => {
+                    if (!canExecuteButtonAction()) return;
+                    fileInput.value = "";
                     fileInput.click();
                 });
                 uploadWidget.serialize = false;
 
-                const folderSeqBtn = node.addWidget("button", "📂 Select Image Sequence Folder...", null, async function (value, canvas, n, pos, event) {
-                    if (!isGenuineUserClick(event)) return;
+                const folderSeqBtn = node.addWidget("button", "📂 Select Image Sequence Folder...", "browse_seq", async () => {
+                    if (!canExecuteButtonAction()) return;
                     const customPathWidget = node.widgets?.find(w => w.name === "custom_path");
                     const currentDir = customPathWidget ? String(customPathWidget.value || "") : "";
                     try {
@@ -96,8 +99,8 @@ app.registerExtension({
                 });
                 folderSeqBtn.serialize = false;
 
-                const resetChunksBtn = node.addWidget("button", "🔄 Reset Chunk Progress (Start from 0)", null, async function (value, canvas, n, pos, event) {
-                    if (!isGenuineUserClick(event)) return;
+                const resetChunksBtn = node.addWidget("button", "🔄 Reset Chunk Progress (Start from 0)", "reset_chunks", async () => {
+                    if (!canExecuteButtonAction()) return;
                     try {
                         await api.fetchApi("/blackbox_media/reset_chunks", { method: "POST" });
                         infoLabel.style.color = "#7ee787";
@@ -409,19 +412,14 @@ app.registerExtension({
                 const origOnConfigure = node.onConfigure;
                 node.onConfigure = function () {
                     node._isConfiguringGraph = true;
+                    node._createdTimestamp = Date.now();
                     try {
                         if (origOnConfigure) origOnConfigure.apply(this, arguments);
-                        // Ensure non-serialized buttons never inherit string values from API JSON inputs array
-                        for (const w of (node.widgets || [])) {
-                            if (w.type === "button") {
-                                w.value = null;
-                            }
-                        }
                     } finally {
                         setTimeout(() => {
                             node._isConfiguringGraph = false;
                             scheduleLoadAnimation();
-                        }, 50);
+                        }, 150);
                     }
                 };
 
@@ -503,15 +501,16 @@ app.registerExtension({
                 const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
                 const node = this;
                 node._isConfiguringGraph = false;
+                node._createdTimestamp = Date.now();
 
-                function isGenuineUserClick(event) {
+                function canExecuteButtonAction() {
                     if (node._isConfiguringGraph || app.configuringGraph) return false;
-                    if (!event) return false;
-                    return (event.type === "pointerdown" || event.type === "mousedown" || event.type === "click");
+                    if (Date.now() - (node._createdTimestamp || 0) < 400) return false;
+                    return true;
                 }
 
-                const browseBtn = node.addWidget("button", "📂 Select Output Folder...", null, async function (value, canvas, n, pos, event) {
-                    if (!isGenuineUserClick(event)) return;
+                const browseBtn = node.addWidget("button", "📂 Select Output Folder...", "browse_folder", async () => {
+                    if (!canExecuteButtonAction()) return;
                     const outDirWidget = node.widgets?.find(w => w.name === "output_directory");
                     const currentDir = outDirWidget ? String(outDirWidget.value || "") : "";
 
@@ -538,17 +537,13 @@ app.registerExtension({
                 const origOnConfigure = node.onConfigure;
                 node.onConfigure = function () {
                     node._isConfiguringGraph = true;
+                    node._createdTimestamp = Date.now();
                     try {
                         if (origOnConfigure) origOnConfigure.apply(this, arguments);
-                        for (const w of (node.widgets || [])) {
-                            if (w.type === "button") {
-                                w.value = null;
-                            }
-                        }
                     } finally {
                         setTimeout(() => {
                             node._isConfiguringGraph = false;
-                        }, 50);
+                        }, 150);
                     }
                 };
 
